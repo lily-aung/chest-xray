@@ -5,6 +5,7 @@ Chest X-ray classification project for Normal / Pneumonia / Tuberculosis
 using classical features (HOG) and deep learning (CNNs, Transformers).
 
 ## Project Structure
+```text
 ├── LICENSE
 ├── Makefile
 ├── README.md
@@ -70,6 +71,8 @@ using classical features (HOG) and deep learning (CNNs, Transformers).
 ├── tests/                 <- Unit tests
 ├── docs/                  <- Project documentation (MkDocs)
 └── references/            <- Background material and references
+
+```
 
 ## Experiments
 1. CNNs (ResNet, DenseNet, EfficientNet)
