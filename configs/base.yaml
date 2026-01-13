@@ -1,0 +1,12 @@
+seed: 42
+epochs: 30
+batch_size: 32
+optimizer:
+  name: adam
+  lr: 1e-4
+model:
+  name: attention
+logging:
+  use_wandb: true
+  use_mlflow: true
+  

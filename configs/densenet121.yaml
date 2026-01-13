@@ -1,0 +1,49 @@
+experiment:
+  name: backbone-linear-probe
+  run_name: densenet121-lp-20
+augmentation:
+  horizontal_flip: true
+  custom_clahe: true
+  rotation_deg: 10
+  shift_limit: 0.05
+  scale_limit: 0.10
+  clahe_clip_limit: 2.0
+  clahe_tile_grid: [8, 8]
+  gaussian_blur: false
+  color_jitter: false
+  fill_mode: nearest
+training:
+  epochs: 20
+  batch_size: 4
+  lr: 1e-3
+  optimizer: adamw
+  weight_decay: 1e-4
+  seed: 42
+  early_stopping: true
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.0
+  min_delta: 0.0
+
+data:
+  img_size: 224
+  num_workers: 2
+  train_csv: data/train.csv
+  val_csv: data/val.csv
+  test_csv: data/test.csv
+  img_dir: null
+  use_imagenet_norm: true
+  class_names: ["Normal", "Pneumonia", "Tuberculosis"]
+
+model:
+  name: densenet121
+  num_classes: 3
+  pretrained: true
+  linear_probe: true
+
+logging:
+  use_mlflow: true
+  use_wandb: true
+  wandb_project: chest-xray
+  mlflow_experiment_name: backbone-linear-probe
+  log_dir: logs
+  console_output: true

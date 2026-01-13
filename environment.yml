@@ -1,0 +1,21 @@
+name: chest-xray
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - numpy
+      - pandas
+      - matplotlib
+      - scikit-learn
+      - tqdm
+      - pillow
+      - torch
+      - torchvision
+      - torchaudio
+      - opencv-python
+      - albumentations
+      - jupyter
+      - ipykernel
+

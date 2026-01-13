@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  wandb:
+    image: wandb/local:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - wandb:/vol
+    restart: unless-stopped
+
+volumes:
+  wandb:
+    external: true
+

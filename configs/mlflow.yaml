@@ -1,0 +1,28 @@
+mlflow:
+  enabled: true
+
+  # Experiment
+  experiment_name: "backbone-linear-probe"
+
+  # Tracking
+  tracking:
+    backend: "sqlite"          # sqlite | http
+    uri: "sqlite:///mlflow.db" # relative to project root
+
+  # Artifacts
+  artifacts:
+    root: "mlruns"             # relative to project root
+
+  # Logging 
+  logging:
+    log_models: false          #log manually
+    log_best:
+      enabled: true
+      by: "macro_f1"           # macro_f1 | accuracy
+      artifact_path:
+        macro_f1: "best_model_macro_f1"
+        accuracy: "best_model"
+
+  tags:
+    project: "chest-xray"
+    task: "classification"
