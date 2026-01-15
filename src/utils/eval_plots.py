@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, confusion_matrix, \
-    precision_recall_fscore_support, accuracy_score, balanced_accuracy_score, roc_auc_score
+    precision_recall_fscore_support, accuracy_score, balanced_accuracy_score, roc_auc_score, classification_report
 
 def _ensure_parent(p: Path):
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -166,13 +166,10 @@ def compute_classification_report(y_true: np.ndarray, y_pred: np.ndarray, probs:
     summary = {"accuracy": float(accuracy_score(y_true, y_pred)), "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)), "macro_precision": float(prec_macro), "macro_recall_sensitivity": float(rec_macro), "macro_f1": float(f1_macro), "micro_precision": float(prec_micro), "micro_recall": float(rec_micro), "micro_f1": float(f1_micro), "auc_roc_ovr": auc_ovr, "avg_precision_ovr": ap_ovr, "ece": ece, "confusion_matrix": cm.tolist(), "per_class": per_class}
     return summary
 
-
 def report_tables(report: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     per_class_df = pd.DataFrame(report["per_class"])
     summary_df = pd.DataFrame([{k: report[k] for k in report.keys() if k not in {"per_class", "confusion_matrix"}}])
     return summary_df, per_class_df
-
-
 
 
 def _ensure_dir(p: Path):
@@ -187,7 +184,7 @@ def plot_confusion_matrix_counts_and_percent(cm: np.ndarray, class_names: list[s
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
             annot[i, j] = f"{int(cm[i,j])}\n({cm_pct[i,j]:.1f}%)"
-    plt.figure(figsize=(7, 6))
+    plt.figure(figsize=(4, 4))
     ax = sns.heatmap(cm_pct, annot=annot, fmt="", cmap=cmap, vmin=0, vmax=100, xticklabels=class_names, yticklabels=class_names, cbar_kws={"label": "% of true class"})
     ax.set_title(title)
     ax.set_xlabel("Predicted label")
@@ -196,6 +193,64 @@ def plot_confusion_matrix_counts_and_percent(cm: np.ndarray, class_names: list[s
     ax.tick_params(axis="y", rotation=0)
     plt.tight_layout()
     plt.savefig(out_png, dpi=220)
+    plt.close()
+
+def plot_confusion_and_classification_report(y_true, y_pred, class_names, out_png, title="Classification Report"):
+    out_png.parent.mkdir(parents=True, exist_ok=True)
+    cm = confusion_matrix(y_true, y_pred)
+    cm_pct = cm / np.clip(cm.sum(axis=1, keepdims=True), 1, None) * 100
+    fig = plt.figure(figsize=(6, 6))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1.6,1])
+    ax = fig.add_subplot(gs[0])
+    im = ax.imshow(cm_pct, cmap="Blues", vmin=0, vmax=100)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, f"{cm[i,j]}\n({cm_pct[i,j]:.1f}%)", ha="center", va="center", color="black", fontsize=10)
+    ax.set(xticks=range(len(class_names)), yticks=range(len(class_names)),
+           xticklabels=class_names, yticklabels=class_names,
+           xlabel="Predicted label", ylabel="True label",
+           title="Confusion Matrix")
+    ax.set_aspect('equal')                     
+    ax.set_xlim(-0.5, len(class_names)-0.5)   
+    ax.set_ylim(len(class_names)-0.5, -0.5)  
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.02, label="% of true class")
+    ax = fig.add_subplot(gs[1])
+    ax.axis("off")
+    
+    df = pd.DataFrame(classification_report( y_true, y_pred, target_names=class_names, output_dict=True, zero_division=0)).T
+    spec = {}
+    for i, c in enumerate(class_names):
+        TP = cm[i,i]; FP = cm[:,i].sum() - TP; FN = cm[i].sum() - TP
+        TN = cm.sum() - (TP + FP + FN)
+        spec[c] = TN / (TN + FP) if (TN + FP) else 0
+    df["specificity"] = np.nan
+    for c, v in spec.items(): df.loc[c, "specificity"] = v
+    cols = ["precision", "recall", "f1-score", "specificity", "support"]
+    df = df.reindex(columns=cols)
+    df["support"] = df["support"].round(0).astype("Int64")
+    df = df.round(2)
+    df = df.fillna("")
+    df = df.astype(object) 
+    if "accuracy" in df.index:
+        df.loc["accuracy", ["precision", "recall", "specificity", "support"]] = ""
+    tbl = ax.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index,
+                   loc="center", cellLoc="center")
+    tbl.auto_set_font_size(False); tbl.set_fontsize(10); 
+    tbl.scale(1.2,1.2)
+    for (r, c), cell in tbl.get_celld().items():
+        if r == 0:
+            cell.set_text_props(weight="bold", color="white"); cell.set_facecolor("#123456")
+        else:
+            cell.set_facecolor("#E5EFF8" if r % 2 == 0 else "white")
+            #cell.set_facecolor("#F8FBFD" )
+        cell.set_edgecolor("#F8FBFD"); 
+        cell.set_linewidth(0.2)
+    for c in range(df.shape[1]):
+        for r in range(1, df.shape[0] + 1): tbl[(r, c)]._loc = "right"
+    ax.set_title("Classification Report", fontsize=10, pad=0)
+    fig.suptitle(title, fontsize=12)
+    plt.tight_layout(); 
+    plt.savefig(out_png, dpi=300); 
     plt.close()
 
 def plot_misclassifications_bar(y_true: np.ndarray, y_pred: np.ndarray, class_names: list[str], out_png: Path, title: str = "Misclassifications by true class"):

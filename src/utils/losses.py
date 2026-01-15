@@ -5,7 +5,7 @@ import torch
 
 def compute_class_weights_from_dataset(dataset, num_classes, device=None, strategy="inv_freq"):
     counts = np.zeros(int(num_classes), dtype=np.int64)
-    for _, label in dataset:
+    for _, label, _ in dataset:
         counts[int(label)] += 1
     if counts.sum() == 0:
         raise ValueError("Empty dataset: cannot compute class weights")
