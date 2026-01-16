@@ -10,3 +10,9 @@ Build locally with:
 Serve locally with:
 
     mkdocs serve
+
+# Documentation Index
+
+- [Setup Guide](setup-guide.md)
+- [Workflow Guide](workflow-guide.md)
+- [Technical Test](technical-test.md)

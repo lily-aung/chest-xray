@@ -1,17 +1,43 @@
-# Chest X-ray Classification
+# 🩻 Chest X-Ray Disease Classification
 
-## Overview
-Chest X-ray classification project for Normal / Pneumonia / Tuberculosis
-using classical features (HOG) and deep learning (CNNs, Transformers).
+This repository implements an end-to-end medical imaging pipeline for Chest X-ray multi-class classification (Normal / Pneumonia / Tuberculosis), covering:
+- Data exploration and preprocessing
+- Classical ML baselines (HOG + ML)
+- Deep learning models (CNNs, Backbone + Linear Probe : ResNet , DenseNet, EfficientNet, Swin Transformer)
+- Model selection and explainability (Grad-CAM)
+- Deployment via Docker (CLI inference + FastAPI service)
+- Lightweight web UI for visualization
+The project is designed to be reproducible, modular, and deployment-ready.
 
-## Project Structure
+# 🔬 Project Workflow (High Level)
+
+Raw Data
+  ↓
+EDA & Preprocessing
+  ↓
+Model Training (CNN / Transformer / HOG)
+  ↓
+Evaluation & Error Analysis
+  ↓
+Best Model Selection
+  ↓
+Model Bundle Creation
+  ↓
+Docker Inference / API
+  ↓
+Web UI + Grad-CAM Visualization
+
+
+## Repository Structure
 ```text
 ├── LICENSE
 ├── Makefile
 ├── README.md
 ├── environment.yml        <- Conda environment for reproducibility
 ├── pyproject.toml
-│
+
+├── artifacts/              Classical ML & auxiliary model artifacts
+├── bundles/                Deployment-ready model bundles
 ├── configs/               <- YAML configs for experiments and models
 │   ├── base.yaml
 │   ├── cnn.yaml
@@ -22,26 +48,14 @@ using classical features (HOG) and deep learning (CNNs, Transformers).
 │
 ├── data/
 │   ├── raw/               <- Original X-ray images (not tracked in Git)
-│   ├── interim/           <- Intermediate preprocessing outputs
-│   ├── processed/         <- Final model-ready images
-│   ├── external/          <- Optional external datasets
 │   ├── eda/               <- Dataset statistics and plots
 │   ├── train.csv
 │   ├── val.csv
 │   └── test.csv
-│
-├── src/
-│   ├── data/              <- Dataset and DataLoader logic
-│   ├── models/            <- Model builders (CNNs, ViTs)
-│   ├── engine/            <- Training, evaluation, callbacks
-│   ├── preprocessing/     <- Image preprocessing (e.g., CLAHE)
-│   ├── utils/             <- Logging, metrics, reproducibility
-│   ├── train.py
-│   ├── train_CNN.py
-│   ├── train_LinearProbe.py
-│   ├── train_hog.py
-│   └── eval_best_models.py
-│
+├── dist/                  <- Exported Docker images (.tar.gz)
+├── docker/                <- Dockerfiles and build context
+├── docs/                  <- Guides for Setup & WorkFlow 
+├── logs/                  <- Training and runtime logs
 ├── notebooks/             <- Exploratory data analysis and preprocessing
 │   ├── 01.EDA.ipynb
 │   │   ├── Dataset statistics and class distribution
@@ -64,22 +78,31 @@ using classical features (HOG) and deep learning (CNNs, Transformers).
 │   │
 │   ├── mlflow.db               <- Local MLflow tracking (not committed)
 │   └── mlruns/                 <- MLflow runs (not committed)
-├── reports/
+├── reports/                <-  Results, plots, inference outputs
 │   ├── figures/           <- Confusion matrices, ROC, Grad-CAM
 │   └── best_model_eval/   <- Final evaluation outputs
-│
-├── tests/                 <- Unit tests
-├── docs/                  <- Project documentation (MkDocs)
-└── references/            <- Background material and references
-
+├── references/            <- Background material and references
+├── src/
+│   ├── data/              <- Dataset and DataLoader logic
+│   ├── models/            <- Model builders (CNNs)
+│   ├── engine/            <- Trainer: Training, evaluation, callbacks
+│   ├── preprocessing/     <- Image preprocessing (e.g., CLAHE)
+│   ├── utils/             <- Logging, metrics, reproducibility
+│   ├── train.py
+│   ├── train_CNN.py
+│   ├── train_LinearProbe.py
+│   ├── train_hog.py
+│   └── eval_best_models.py
+└── wandb                   <- Expirementtracking artifacts
 ```
+I have also created a README for bundles, docker, src, data and reports
 
-## Experiments
-1. CNNs (ResNet, DenseNet, EfficientNet)
-2. Linear probing
+
+## Models Implemented
+1. Deeplerning :CNN
+2. Linear Probe + Fine-tuned : Deeplearning (ResNet-50, DenseNet-121, EfficientNet-B0, Swin-Tiny )
 3. HOG + MLP / XGBoost / RandomForest baseline
-4. Fine-tuning best model
-5. Explainability (Grad-CAM / attention)
+4. Explainability (Grad-CAM / attention)
 
 ## Model Selection and Evaluation
 
@@ -92,15 +115,33 @@ The evaluated model families include:
 
 Model selection is driven entirely by **MLflow experiment tracking**, without manual configuration or post-hoc tuning, ensuring a fully reproducible and unbiased evaluation process.
 
+## Explainability
+Only support for CNN at this stage 
+- Grad-CAM
+- Grad-CAM++
+- Smooth Grad-CAM
+
+## Deployment
+- CLI inference container
+- FastAPI prediction service
+- Self-contained model bundles
+- Web UI (image upload → prediction → Grad-CAM)
 
 ## Reproducibility
-```bash
-conda env create -f environment.yml
-conda activate chest-xray
-python src/train.py --config configs/densenet121.yaml
-```
+- YAML-based experiment configs
+- MLflow tracking (local)
+- Deterministic seeds
+- Versioned model bundles
+
+## 📘 Documentation
+
+- [Setup Guide (Training Environment)](docs/setup-guide.md)
+- [Workflow Guide (Training, Evaluation, Makefile)](docs/workflow-guide.md)
+- [Technical Test: Chest X-Ray Classification](docs/TechnicalReport.pdf)
+
+## License
+See LICENSE for details.
 
 ## Disclaimer
-
 This project is for research and educational purposes only.
 It is not intended for clinical use, diagnosis, or medical decision-making.
