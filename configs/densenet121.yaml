@@ -1,6 +1,7 @@
 experiment:
   name: backbone-linear-probe
   run_name: densenet121-lp-20
+
 augmentation:
   horizontal_flip: true
   custom_clahe: true
@@ -12,6 +13,7 @@ augmentation:
   gaussian_blur: false
   color_jitter: false
   fill_mode: nearest
+  
 training:
   epochs: 20
   batch_size: 4

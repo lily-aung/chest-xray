@@ -1,4 +1,3 @@
-
 import pandas as pd
 def resolve_csv_columns(df: pd.DataFrame) -> tuple[str, str]:
     for c in ["path", "image_path", "filepath", "filename", "image", "img_path"]:

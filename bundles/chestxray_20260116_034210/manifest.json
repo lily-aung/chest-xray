@@ -1,0 +1,27 @@
+{
+  "bundle_format_version": "1.0",
+  "created_at_utc": "2026-01-16T08:42:19.749591+00:00",
+  "semver": "0.1.0",
+  "mlflow_run_id": "0578cf379372432998cb6eb00b25979a",
+  "mlflow_model_uri": null,
+  "source_run_dir": "reports/best_model_b01/cnn__cnn-30-flip-clahe",
+  "git_commit": "706c7bf5e9c1d0770d6c328060b6c25f0bb782df",
+  "class_names": [
+    "Normal",
+    "Pneumonia",
+    "Tuberculosis"
+  ],
+  "hashes": {
+    "thresholds_policy_sha256": "9e25ac60ee57493741c9cf22c8b8abef0b9a02e17385644140b388030f4c5759",
+    "model_dir_sha256": "333a14e7e3260d5d8473f242cde4f1ba91008ea486a91c358494d5f9fe36f48e"
+  },
+  "artifacts": {
+    "model": "model/",
+    "policy": "thresholds_policy.json",
+    "class_names": "class_names.json",
+    "preprocessing_source_config": "preprocessing_source_config.yaml"
+  },
+  "model_family": "cnn",
+  "gradcam_target_layer": "features.8",
+  "cam_method": "gradcam-pp-smooth"
+}

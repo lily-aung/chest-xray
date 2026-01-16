@@ -1,4 +1,4 @@
-from .cnn import CNNBaseline
+from .cnn import CNNBaseline, CNNBaselineV2
 from .backbones import (build_resnet50, build_densenet121, build_efficientnet_b0, build_swin_tiny)
 
 def build_model(model_cfg):
@@ -8,9 +8,6 @@ def build_model(model_cfg):
     Expected model_cfg:
       - model_cfg.name
       - model_cfg.num_classes
-    Optional:
-      - model_cfg.pretrained (bool, default True)
-      - model_cfg.timm_name (str, optional, for timm-based models like Swin)
     """
     model_name = model_cfg.name.lower()
     num_classes = model_cfg.num_classes
@@ -20,6 +17,9 @@ def build_model(model_cfg):
 
     if model_name == "cnn_baseline":
         return CNNBaseline(num_classes=num_classes)
+    
+    if model_name == "cnn_baselinev2":
+        return CNNBaselineV2(num_classes=num_classes)
 
     elif model_name == "resnet50":
         return build_resnet50(num_classes=num_classes, pretrained=pretrained)
@@ -36,5 +36,5 @@ def build_model(model_cfg):
     else:
         raise ValueError(
             f"Model '{model_name}' not recognized. Available: "
-            "['cnn_baseline', 'cnn_attention', 'resnet50', 'densenet121', "
+            "['cnn_baseline', 'cnn_baselinev2', 'cnn_attention', 'resnet50', 'densenet121', "
             "'efficientnet_b0', 'swin_tiny_patch4_window7_224']")

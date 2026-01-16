@@ -1,15 +1,44 @@
-version: "3.8"
-
 services:
+  mysql:
+    image: mysql:8
+    container_name: wandb-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wandb_local
+      MYSQL_USER: wandb_local
+      MYSQL_PASSWORD: wandb_local
+      MYSQL_ROOT_PASSWORD: wandb_root
+    ports:
+      - "3306:3306"
+    volumes:
+      - wandb_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-pwandb_root"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   wandb:
     image: wandb/local:latest
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # KEY FIX: use mysql service name (mysql), not 127.0.0.1
+      DB: mysql://wandb_local:wandb_local@mysql:3306/wandb_local
+      USE_DB: mysql
+      # some versions also use these:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: wandb_local
+      MYSQL_USER: wandb_local
+      MYSQL_PASSWORD: wandb_local
     ports:
       - "8080:8080"
     volumes:
-      - wandb:/vol
-    restart: unless-stopped
+      - wandb_data:/vol
 
 volumes:
-  wandb:
-    external: true
-
+  wandb_mysql:
+  wandb_data:

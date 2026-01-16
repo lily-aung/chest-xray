@@ -1,0 +1,12 @@
+{
+  "best_model": {
+    "model_name": "cnn__cnn-30-flip-clahe",
+    "run_dir": "reports/best_model_b01/cnn__cnn-30-flip-clahe",
+    "score": 0.7757461048219759,
+    "metric": "macro_f1",
+    "source": "policy",
+    "mlflow_run_id": "0578cf379372432998cb6eb00b25979a",
+    "model_family": "cnn",
+    "gradcam_target_layer": "features.8"
+  }
+}

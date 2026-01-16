@@ -1,4 +1,3 @@
-# src/utils/smooth_gradcam.py
 from __future__ import annotations
 import numpy as np
 import torch
@@ -6,7 +5,7 @@ import torch
 class SmoothGradCAM:
     """
     SmoothGrad-CAM: average multiple Grad-CAM maps from noisy versions of the input.
-    Works with your existing GradCAM engine (callable returning cam, class_id, score).
+    GradCAM engine (callable returning cam, class_id, score)
     """
     def __init__(self, cam_engine, n_samples: int = 25, noise_std: float = 0.10, clamp: bool = True):
         """

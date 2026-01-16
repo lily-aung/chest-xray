@@ -28,8 +28,7 @@ def save_features_npz(out_dir, split, X, y, paths):
         os.path.join(out_dir, f"hog_{split}.npz"),
         X=X.astype(np.float32),
         y=y.astype(np.int64),
-        paths=np.array(paths)
-    )
+        paths=np.array(paths) )
 
 def load_gray01(path: str, img_size: int) -> np.ndarray:
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
@@ -192,10 +191,10 @@ def main():
         ("scaler", StandardScaler()),
         ("pca", PCA(n_components=0.95, random_state=args.seed)),
         ("mlp", MLPClassifier(
-            hidden_layer_sizes=(128,),   # 👈 key change
+            hidden_layer_sizes=(128,),   # key change
             activation="relu",
             solver="adam",
-            alpha=1e-3,                  # 👈 stronger regularization
+            alpha=1e-3,                  # stronger regularization
             batch_size=128,
             learning_rate_init=1e-3,
             max_iter=150,
@@ -246,7 +245,7 @@ def main():
 
     pd.DataFrame(summary).sort_values("val_macro_f1", ascending=False).to_csv(
         os.path.join(args.out_dir, "summary.csv"), index=False)
-    print(f"✅✅✅ Saved outputs to: {args.out_dir}")
+    print(f"[OK] Saved outputs to: {args.out_dir}")
 
 if __name__ == "__main__":
     main()

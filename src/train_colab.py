@@ -200,7 +200,7 @@ def main():
     )
 
     trainer.fit(train_loader, val_loader, epochs=cfg.training.epochs)
-    logger.info("✅✅✅ Training complete")
+    logger.info("[OK]Training complete")
 
     # --- Restore best model from MLflow (preferred), else fallback to in-memory best ---
     restored = False
@@ -223,7 +223,7 @@ def main():
 
     # --- Final evals ---
     _ = trainer.evaluate(val_loader, split="val")
-    logger.info("✅✅✅ Evaluation complete")
+    logger.info("[OK] Evaluation complete")
 
     test_dataset = build_test_dataset(cfg)
     test_loader = build_dataloader(
@@ -233,7 +233,7 @@ def main():
         num_workers=cfg.data.num_workers,
     )
     _ = trainer.evaluate(test_loader, split="test", log_confusion_matrix=True)
-    logger.info("✅✅✅ Testing complete")
+    logger.info("[OK]Testing complete")
 
 
     # ---- Save best model weights to disk (no MLflow needed) ----
@@ -257,7 +257,7 @@ def main():
             },
             save_path,
         )
-        logger.info(f"✅ Saved best_macro_f1 checkpoint to: {save_path}")
+        logger.info(f"[OK] Saved best_macro_f1 checkpoint to: {save_path}")
     else:
         logger.warning("No best_state_dict_macro_f1 found; nothing saved.")
 

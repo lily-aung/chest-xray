@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chest X-ray Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background:#f7f7fb; }
+    .container { padding: 16px; display: grid; gap: 16px; max-width: 1200px; margin: 0 auto; }
+    .card { border: 1px solid #e5e5ee; border-radius: 12px; padding: 12px; background:#fff; }
+    .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    input[type="file"] { display:none; }
+    .text { padding:10px; border-radius:10px; border:1px solid #cfcfe3; min-width:240px; flex:1; }
+    .status { color: #555; font-size: 14px; }
+
+    button { padding: 10px 12px; border-radius: 10px; border: 1px solid #cfcfe3; background: #fff; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .imgbox {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px dashed #c9c9d8;
+      background: #fafafe;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      overflow:hidden;
+      min-height: 320px;
+      padding: 8px;
+    }
+    .imgbox img { width: 100%; height: auto; display: block; border-radius: 10px; }
+    .placeholder { color:#6b7280; font-size:14px; }
+
+    /* layout */
+    .grid-main { display:grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items:start; }
+    .grid-bottom { display:grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid-main { grid-template-columns: 1fr; } }
+
+    /* prediction UI */
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; background:#fff; }
+    .pill-muted { color:#6b7280; background:#f9fafb; }
+    .pill-ok { background:#ecfdf5; border-color:#a7f3d0; color:#065f46; }
+    .pill-warn { background:#fffbeb; border-color:#fde68a; color:#92400e; }
+    .pill-bad { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+
+    .pred-grid { display:grid; grid-template-columns: 1fr 1.2fr; gap:14px; align-items:start; }
+    @media (max-width: 900px) { .pred-grid { grid-template-columns: 1fr; } }
+
+    .pred-main { padding:12px; border:1px solid #eee; border-radius:12px; background:linear-gradient(180deg,#ffffff, #fafafa); }
+    .pred-label { font-size:22px; font-weight:800; letter-spacing:-0.02em; }
+    .pred-sub { margin-top:6px; color:#555; font-size:13px; }
+
+    .pred-bars { padding:12px; border:1px solid #eee; border-radius:12px; background:#fff; }
+    .bar-row { display:grid; grid-template-columns: 90px 1fr 56px; gap:10px; align-items:center; margin:10px 0; }
+    .bar-name { font-size:13px; color:#374151; }
+    .bar-track { height:10px; border-radius:999px; background:#f3f4f6; overflow:hidden; border:1px solid #eee; }
+    .bar-fill { height:100%; width:0%; border-radius:999px; background:#111827; transition: width 180ms ease; }
+    .bar-val { font-variant-numeric: tabular-nums; font-size:13px; color:#111827; text-align:right; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background:#0b1324;
+      color:#e8eefc;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid #1e2a44;
+      max-height: 420px;
+      overflow:auto;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- header -->
+  <div class="card">
+    <div class="row">
+      <label>
+        <input id="fileInput" type="file" accept="image/*" />
+        <button id="uploadBtn">Upload X-ray</button>
+      </label>
+
+      <input id="apiBase" class="text" placeholder="API base e.g. http://localhost:8000" value="http://localhost:8000" />
+      <input id="apiToken" class="text" placeholder="API token (optional)" value="chestxray" />
+      <span id="status" class="status"></span>
+    </div>
+  </div>
+
+  <!-- row 1: original + prediction -->
+  <div class="grid-main">
+
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Original image</h3>
+      <div class="imgbox">
+        <div id="previewPlaceholder" class="placeholder">No image yet</div>
+        <img id="previewImg" alt="Original" style="display:none;" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <h3 style="margin:0;">Prediction</h3>
+        <span id="predBadge" class="pill pill-muted">Waiting</span>
+      </div>
+
+      <div class="pred-grid" style="margin-top:12px;">
+        <div class="pred-main">
+          <div class="pred-label" id="predLabel">—</div>
+          <div class="pred-sub">Confidence: <span id="predConf">—</span></div>
+          <div class="row" style="margin-top:10px; gap:10px;">
+            <span class="pill pill-ok" id="policyPill" style="display:none;"></span>
+            <span class="pill pill-muted" id="filePill" style="display:none;"></span>
+          </div>
+        </div>
+
+        <div class="pred-bars">
+          <div class="bar-row"><div class="bar-name">Normal</div><div class="bar-track"><div class="bar-fill" id="bar0"></div></div><div class="bar-val" id="val0">—</div></div>
+          <div class="bar-row"><div class="bar-name">Pneumonia</div><div class="bar-track"><div class="bar-fill" id="bar1"></div></div><div class="bar-val" id="val1">—</div></div>
+          <div class="bar-row"><div class="bar-name">Tuberculosis</div><div class="bar-track"><div class="bar-fill" id="bar2"></div></div><div class="bar-val" id="val2">—</div></div>
+        </div>
+      </div>
+
+      <details style="margin-top:12px;">
+        <summary style="cursor:pointer; color:#555;">Show raw JSON</summary>
+        <pre id="predRaw" style="margin-top:10px;">{}</pre>
+      </details>
+    </div>
+
+  </div>
+
+  <!-- row 2: gradcam -->
+  <div class="grid-bottom">
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Grad-CAM output</h3>
+      <div class="imgbox">
+        <div id="camPlaceholder" class="placeholder">No Grad-CAM yet</div>
+        <img id="camImg" alt="Grad-CAM" style="display:none;" />
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const statusEl  = document.getElementById('status');
+
+  const previewImg = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+  const camImg = document.getElementById('camImg');
+  const camPlaceholder = document.getElementById('camPlaceholder');
+
+  const apiBaseEl = document.getElementById('apiBase');
+  const apiTokenEl = document.getElementById('apiToken');
+//added this to run both frontend and backend on same server
+  apiBaseEl.value = window.location.origin;
+
+  const PREDICT_PATH = "/predict";
+  const GRADCAM_PATH = "/grad_cam";
+
+  const predBadge = document.getElementById('predBadge');
+  const predLabel = document.getElementById('predLabel');
+  const predConf  = document.getElementById('predConf');
+  const predRaw   = document.getElementById('predRaw');
+  const policyPill = document.getElementById('policyPill');
+  const filePill   = document.getElementById('filePill');
+
+  let previewUrl = null;
+  let camUrl = null;
+
+  function setStatus(msg) { statusEl.textContent = msg || ""; }
+
+  function authHeaders() {
+    const token = apiTokenEl.value.trim();
+    return token ? { "Authorization": `Bearer ${token}` } : {};
+  }
+
+  function getApiBase() {
+    const apiBase = apiBaseEl.value.trim().replace(/\/+$/, "");
+    if (!apiBase) throw new Error("Set API base URL first.");
+    return apiBase;
+  }
+
+  async function postFile(url, file, expectBlob=false) {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(url, { method: "POST", headers: { ...authHeaders() }, body: fd });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      let detail = text;
+      try { const obj = JSON.parse(text); detail = obj.detail ? obj.detail : text; } catch {}
+      throw new Error(`${res.status} ${res.statusText}${detail ? " — " + detail : ""}`);
+    }
+    return expectBlob ? await res.blob() : await res.json();
+  }
+
+  function fmtPct(x) {
+    if (typeof x !== "number" || !isFinite(x)) return "—";
+    return (x * 100).toFixed(1) + "%";
+  }
+
+  function setBadge(text, cls) {
+    predBadge.textContent = text;
+    predBadge.className = `pill ${cls || "pill-muted"}`;
+  }
+
+  function resetOutputs() {
+    predRaw.textContent = "{}";
+    predLabel.textContent = "—";
+    predConf.textContent = "—";
+    setBadge("Waiting", "pill-muted");
+    ["bar0","bar1","bar2"].forEach(id => document.getElementById(id).style.width = "0%");
+    ["val0","val1","val2"].forEach(id => document.getElementById(id).textContent = "—");
+    policyPill.style.display = "none";
+    filePill.style.display = "none";
+
+    camImg.style.display = "none";
+    camPlaceholder.style.display = "block";
+  }
+
+  function renderPrediction(pred) {
+    predRaw.textContent = JSON.stringify(pred, null, 2);
+    predLabel.textContent = pred.pred_name ?? "—";
+    predConf.textContent = fmtPct(pred.confidence);
+
+    if (pred.filename) {
+      filePill.style.display = "inline-flex";
+      filePill.textContent = `File: ${pred.filename}`;
+    } else filePill.style.display = "none";
+
+    if (pred.pred_policy_name != null) {
+      policyPill.style.display = "inline-flex";
+      policyPill.textContent = `Policy: ${pred.pred_policy_name}`;
+      policyPill.className = "pill pill-ok";
+    } else policyPill.style.display = "none";
+
+    const c = pred.confidence ?? 0;
+    if (c >= 0.80) setBadge("High confidence", "pill-ok");
+    else if (c >= 0.55) setBadge("Borderline", "pill-warn");
+    else setBadge("Low confidence", "pill-bad");
+
+    const probs = Array.isArray(pred.probs) ? pred.probs : [];
+    [0,1,2].forEach(i => {
+      const p = typeof probs[i] === "number" ? probs[i] : 0;
+      document.getElementById(`bar${i}`).style.width = `${Math.max(0, Math.min(1, p)) * 100}%`;
+      document.getElementById(`val${i}`).textContent = fmtPct(p);
+    });
+  }
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    resetOutputs();
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+    previewImg.src = previewUrl;
+    previewImg.style.display = "block";
+    previewPlaceholder.style.display = "none";
+
+    uploadBtn.disabled = true;
+
+    let apiBase;
+    try { apiBase = getApiBase(); }
+    catch (e) { setStatus("Error: " + e.message); uploadBtn.disabled = false; return; }
+
+    try {
+      setStatus("Running prediction…");
+      const pred = await postFile(apiBase + PREDICT_PATH, file, false);
+      renderPrediction(pred);
+
+      setStatus("Generating Grad-CAM…");
+      const camBlob = await postFile(apiBase + GRADCAM_PATH, file, true);
+
+      if (camUrl) URL.revokeObjectURL(camUrl);
+      camUrl = URL.createObjectURL(camBlob);
+
+      camImg.src = camUrl;
+      camImg.style.display = "block";
+      camPlaceholder.style.display = "none";
+
+      setStatus("✅ Completed");
+    } catch (e) {
+      console.error(e);
+      setStatus("Error: " + (e.message || String(e)));
+      predRaw.textContent = JSON.stringify({ error: e.message || String(e) }, null, 2);
+      setBadge("Error", "pill-bad");
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

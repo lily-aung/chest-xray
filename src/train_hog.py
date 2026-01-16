@@ -213,7 +213,7 @@ def main():
             "hog_ppc":args.hog_ppc,"hog_cpb":args.hog_cpb,"hog_orientations":args.hog_orientations})
     pd.DataFrame(summary).sort_values("val_macro_f1", ascending=False).to_csv(
         os.path.join(args.out_dir, "summary.csv"), index=False)
-    print(f"✅✅✅ Saved outputs to: {args.out_dir}")
+    print(f"[OK] Saved outputs to: {args.out_dir}")
 
 if __name__ == "__main__":
     main()

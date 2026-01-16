@@ -64,7 +64,8 @@ class ChestXrayDataset(Dataset):
         self.to_rgb = bool(to_rgb)
         self.strict = bool(strict)
         self.clahe = A.CLAHE( clip_limit=float(clahe_clip_limit), tile_grid_size=tuple(clahe_tile_grid), p=1.0)
-
+        print("ChestXrayDataset : Feature Exraction in Progress >>> " )
+        print("Contrast Enhancement : ",  use_custom_clahe)
     def __len__(self):
         return len(self.df)
 
@@ -96,6 +97,7 @@ class ChestXrayDataset(Dataset):
 
         # CLAHE on under/over-exposed images
         if self.use_custom_clahe and check_exposure(image):
+            
             image = self.clahe(image=image)["image"]
         # HWC formatting for Albumentations
         if self.to_rgb:
@@ -107,7 +109,7 @@ class ChestXrayDataset(Dataset):
             out = self.transforms(image=image)
             image = out["image"]
 
-        return image, int(row["label"])
+        return image, int(row["label"]), row["image_path"]
 
     def _empty_sample(self, label: int):
         import numpy as np
@@ -117,7 +119,6 @@ class ChestXrayDataset(Dataset):
         if self.transforms is not None:
             img = self.transforms(image=img)["image"]
         return img, int(label)
-
 
 def build_datasets(cfg):
     use_imagenet_norm = bool(getattr(cfg.data, "use_imagenet_norm", False))
@@ -131,7 +132,6 @@ def build_datasets(cfg):
         clahe_clip_limit=cfg.augmentation.clahe_clip_limit,
         clahe_tile_grid=tuple(cfg.augmentation.clahe_tile_grid),
         to_rgb=to_rgb, strict=True)
-
     if cfg.augmentation.horizontal_flip:
         train_flip = ChestXrayDataset( csv_file=cfg.data.train_csv,  img_dir=getattr(cfg.data, "img_dir", None),
             transforms=train_flip_transforms(cfg, use_imagenet_norm=use_imagenet_norm, is_rgb=to_rgb),
@@ -150,7 +150,7 @@ def build_datasets(cfg):
     return train_dataset, val_dataset
 
 
-def build_test_dataset(cfg, test_csv = None):
+def build_test_dataset_bk(cfg, test_csv = None):
     use_imagenet_norm = bool(getattr(cfg.data, "use_imagenet_norm", False))
     model_name = str(cfg.model.name).lower()
     to_rgb = bool(getattr(cfg.model, "pretrained", False)) and model_name not in {"cnn_baseline", "cnn_attention"}
@@ -161,4 +161,22 @@ def build_test_dataset(cfg, test_csv = None):
     test_dataset = ChestXrayDataset( csv_file=test_csv, img_dir=getattr(cfg.data, "img_dir", None),
         transforms=val_transforms(cfg.data.img_size, use_imagenet_norm=use_imagenet_norm, is_rgb=to_rgb),
         use_custom_clahe=False, to_rgb=to_rgb, strict=True)
+    return test_dataset
+
+def build_test_dataset(cfg, test_csv=None):
+    use_imagenet_norm = bool(getattr(cfg.data, "use_imagenet_norm", False))
+    model_name = str(cfg.model.name).lower()
+    to_rgb = bool(getattr(cfg.model, "pretrained", False)) and model_name not in {"cnn_baseline", "cnn_attention"}
+    if test_csv is None:
+        test_csv = getattr(cfg.data, "test_csv", None)
+    if test_csv is None:
+        raise ValueError("test_csv is required (passed in or cfg.data.test_csv)")
+
+    test_dataset = ChestXrayDataset(
+        csv_file=test_csv, img_dir=getattr(cfg.data, "img_dir", None),
+        transforms=val_transforms(cfg.data.img_size, use_imagenet_norm=use_imagenet_norm, is_rgb=to_rgb),
+        use_custom_clahe=bool(getattr(cfg.augmentation, "custom_clahe", False)),
+        clahe_clip_limit=float(getattr(cfg.augmentation, "clahe_clip_limit", 2.0)),
+        clahe_tile_grid=tuple(getattr(cfg.augmentation, "clahe_tile_grid", (8, 8))),
+        to_rgb=to_rgb, strict=True)
     return test_dataset

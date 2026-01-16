@@ -53,6 +53,7 @@ def main():
     set_seed(cfg.training.seed)
     device = torch.device("mps" if torch.backends.mps.is_available()
         else "cuda" if torch.cuda.is_available() else "cpu")
+    print('devices on ', device)
     logger = setup_logging(cfg)
     run_name = cfg.experiment.run_name or f"seed-{cfg.training.seed}"
     # --- MLflow init
@@ -106,15 +107,15 @@ def main():
 
         logger.info("Linear probing enabled: backbone frozen, classifier trainable only")
 
-        total_params = sum(p.numel() for p in model.parameters())
-        trainable_params_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        frozen_params_count = total_params - trainable_params_count
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    frozen_params_count = total_params - trainable_params_count
 
-        logger.info(
-            f"Model initialized on {device} | total_params={total_params:,} | "
-            f"trainable_params={trainable_params_count:,} | frozen_params={frozen_params_count:,}")
-        pct = 100.0 * trainable_params_count / max(1, total_params)
-        logger.info(f"Trainable ratio: {pct:.2f}%")
+    logger.info(
+        f"Model initialized on {device} | total_params={total_params:,} | "
+        f"trainable_params={trainable_params_count:,} | frozen_params={frozen_params_count:,}")
+    pct = 100.0 * trainable_params_count / max(1, total_params)
+    logger.info(f"Trainable ratio: {pct:.2f}%")
 
 
     # --- Datasets & loaders ---
@@ -130,33 +131,31 @@ def main():
         train_dataset,
         batch_size=cfg.training.batch_size,
         shuffle=True,
-        num_workers=cfg.data.num_workers,
-    )
+        num_workers=cfg.data.num_workers)
     val_loader = build_dataloader(
         val_dataset,
         batch_size=cfg.training.batch_size,
         shuffle=False,
-        num_workers=cfg.data.num_workers,
-    )
+        num_workers=cfg.data.num_workers)
 
-    images, labels = next(iter(train_loader))
+    #images, labels = next(iter(train_loader))
+    batch = next(iter(train_loader))
+    images, labels = batch[0], batch[1]
+
     logger.info(
         f"Sanity batch: images dtype={images.dtype}, shape={tuple(images.shape)}; "
-        f"labels dtype={labels.dtype}, min={labels.min().item()}, max={labels.max().item()}"
-    )
+        f"labels dtype={labels.dtype}, min={labels.min().item()}, max={labels.max().item()}")
 
     # --- Optimizer / scheduler / callbacks ---
     trainable_params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(
         trainable_params,
         lr=float(cfg.training.lr),
-        weight_decay=float(cfg.training.weight_decay),
-    )
+        weight_decay=float(cfg.training.weight_decay))
     scheduler = lr_scheduler.CosineAnnealingLR(
         optimizer,
         T_max=int(cfg.training.epochs),
-        eta_min=1e-6,
-    )
+        eta_min=1e-6)
 
     callbacks = [
         GradientClippingCallback(max_norm=1.0),
@@ -183,7 +182,7 @@ def main():
     )
 
     trainer.fit(train_loader, val_loader, epochs=cfg.training.epochs)
-    logger.info("✅✅✅ Training complete")
+    logger.info("[OK] Training complete")
 
     # --- Restore best model from MLflow (preferred), else fallback to in-memory best ---
     restored = False
@@ -206,17 +205,16 @@ def main():
 
     # --- Final evals ---
     _ = trainer.evaluate(val_loader, split="val")
-    logger.info("✅✅✅ Evaluation complete")
+    logger.info("[OK] Evaluation complete")
 
     test_dataset = build_test_dataset(cfg)
     test_loader = build_dataloader(
         test_dataset,
         batch_size=cfg.training.batch_size,
         shuffle=False,
-        num_workers=cfg.data.num_workers,
-    )
+        num_workers=cfg.data.num_workers)
     _ = trainer.evaluate(test_loader, split="test", log_confusion_matrix=True)
-    logger.info("✅✅✅ Testing complete")
+    logger.info("[OK] Testing complete")
 
     close_logging()
 

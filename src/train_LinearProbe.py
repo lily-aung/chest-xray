@@ -13,6 +13,7 @@ from src.engine.trainer import Trainer
 from src.utils.losses import build_cross_entropy_with_weights, compute_class_weights_from_dataset
 import torch.optim.lr_scheduler as lr_scheduler
 from src.engine.callbacks import GradientClippingCallback, LRSchedulerCallback, wrap_log_metrics_fn
+from src.data.dataset import (build_datasets, build_test_dataset, infer_class_names_and_num_classes)
 
 def main():
     cfg = load_config("configs/cnn.yaml")
@@ -114,7 +115,7 @@ def main():
 
     trainer.fit(train_loader, val_loader, epochs=cfg.training.epochs)
     
-    logger.info("✅✅✅Training complete")
+    logger.info("[OK]Training complete")
     # Evaluate best model on validation or test
 
     if mlflow_cfg.enabled and mlflow_run_id:
@@ -129,12 +130,12 @@ def main():
     else:     trainer.restore_best(which="macro_f1")#"accuracy"
 
     results = trainer.evaluate(val_loader, split="val")
-    logger.info("✅✅✅Evaluation complete")
+    logger.info("[OK]Evaluation complete")
     # Evaluate
     test_dataset = build_test_dataset(cfg)
     test_loader = build_dataloader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.data.num_workers)    
     test_results = trainer.evaluate(test_loader, split="test", log_confusion_matrix=True)
-    logger.info("✅✅✅Testing complete")
+    logger.info("[OK]Testing complete")
     close_logging()
 
 if __name__ == "__main__":

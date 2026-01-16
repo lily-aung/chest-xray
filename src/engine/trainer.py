@@ -52,7 +52,7 @@ class Trainer:
         running_loss, correct, total = 0.0, 0, 0
         phase = "Train" if is_training else "Validation"
 
-        for batch_idx, (images, labels) in enumerate(tqdm(dataloader, desc=f"Epoch {epoch+1} [{phase}]")):
+        for batch_idx, (images, labels, _) in enumerate(tqdm(dataloader, desc=f"Epoch {epoch+1} [{phase}]")):
             if epoch == 0 and is_training and batch_idx == 0 and self.logger:
                 self.logger.info(" First training batch started ~~~.")
 
@@ -86,7 +86,7 @@ class Trainer:
         all_preds, all_labels = [], []
 
         with torch.no_grad():
-            for images, labels in tqdm(dataloader, desc=f"[Evaluate:{split}]"):
+            for images, labels, _ in tqdm(dataloader, desc=f"[Evaluate:{split}]"):
                 images, labels = self._prep_batch(images, labels)
                 logits = self.model(images)
                 loss = self.criterion(logits, labels)

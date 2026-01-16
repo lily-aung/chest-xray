@@ -1,0 +1,17 @@
+{
+  "path": "/work/data/raw/archive/test/tuberculosis/tuberculosis-828.jpg",
+  "pred_id": 0,
+  "pred_name": "Normal",
+  "confidence": 0.5011606812477112,
+  "probs": [
+    0.5011606812477112,
+    0.0013348596403375268,
+    0.49750450253486633
+  ],
+  "pred_policy_id": 2,
+  "pred_policy_name": "Tuberculosis",
+  "thresholds": {
+    "Pneumonia": 0.51,
+    "Tuberculosis": 0.18
+  }
+}

@@ -1,0 +1,37 @@
+FROM python:3.10-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl ca-certificates \
+    libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Python
+COPY requirements.infer.txt .
+RUN pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir -r requirements.infer.txt
+
+# Backend code
+COPY src/ /app/src/
+
+# UI 
+COPY src/ui/ /app/ui/
+ENV UI_DIR=/app/ui
+
+# Bundle baked into image
+COPY docker/_bundle /bundle
+RUN test -f /bundle/manifest.json && test -d /bundle/model
+
+ENV BUNDLE_DIR=/bundle  UI_DIR=/app/ui \
+    DEVICE=cpu IMG_SIZE=224 \
+    MAX_UPLOAD_BYTES=10485760 \
+    MAX_FILES_PER_BATCH=32
+
+EXPOSE 8000
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "src.api.app:app", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "120"]
+
+

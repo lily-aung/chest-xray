@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,7 +67,6 @@ def pick_operating_points_ovr( sweep_ovr: pd.DataFrame, min_sensitivity: dict,
         # if constraints impossible, fallback to best recall
         if len(gg) == 0:
             gg = g.sort_values(["recall_sensitivity", "threshold"], ascending=[False, False]).head(1)
-
         # objective + conservative tie-breaker: prefer higher threshold
         if objective == "max_specificity":
             row = gg.sort_values(["specificity", "f1", "threshold"], ascending=[False, False, False]).iloc[0]
@@ -109,3 +109,13 @@ def predict_with_policy_explicit(probs_all, names, thr):
     return y_pred
 
 
+def predict_with_policy_idx( probs: np.ndarray,   class_names: List[str], thresholds: Dict[str, float],
+    priority: Tuple[str, ...] = ("Tuberculosis", "Pneumonia"), fallback: str = "Normal" ) -> int:
+    name_to_id = {n: i for i, n in enumerate(class_names)}
+    for cname in priority:
+        if cname in thresholds and cname in name_to_id:
+            if float(probs[name_to_id[cname]]) >= float(thresholds[cname]):
+                return int(name_to_id[cname])
+    if fallback not in name_to_id:
+        return int(np.argmax(probs))
+    return int(name_to_id[fallback])

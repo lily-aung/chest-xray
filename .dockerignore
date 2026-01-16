@@ -1,0 +1,14 @@
+data/
+reports/
+artifacts/
+mlruns/
+wandb/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.git/
+.DS_Store
+.idea/
+.vscode/

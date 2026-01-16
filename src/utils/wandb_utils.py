@@ -5,7 +5,6 @@ def init_wandb(project, run_name, config, mlflow_run_id=None):
     if mlflow_run_id:
         wandb.config.update( {"mlflow_run_id": mlflow_run_id},allow_val_change=True)
 
-
 def log_metrics(metrics: dict, step: int):
     """
     Log metrics to WandB safely.

@@ -136,6 +136,7 @@ def get_best_linear_probe_runs(experiment_name: str, metric: str = "macro_f1", m
     runs = mlflow.search_runs(experiment_ids=[exp.experiment_id], output_format="pandas")
     mcol = f"metrics.{metric}"; runs = runs.dropna(subset=[mcol])
     runs["backbone"] = runs["tags.mlflow.runName"].str.split("-lp").str[0]
+    runs = runs[runs["backbone"] != "cnn-ft50ep-clahe"]###exclude from analyssi
     best = runs.sort_values(mcol, ascending=not maximize).groupby("backbone", as_index=False).head(1)
     return best[["backbone", "tags.mlflow.runName", mcol, "run_id"]].rename(
         columns={"tags.mlflow.runName": "run_name", mcol: metric})

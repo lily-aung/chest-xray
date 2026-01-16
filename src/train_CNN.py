@@ -59,7 +59,7 @@ def main():
     trainer.fit(train_loader, val_loader, epochs=cfg.training.epochs)
 
     close_logging(); 
-    logger.info("✅Training complete")
+    logger.info("[OK] >> Training complete")
 
 
 if __name__ == "__main__":

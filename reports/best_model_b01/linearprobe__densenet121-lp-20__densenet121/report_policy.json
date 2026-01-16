@@ -1,0 +1,59 @@
+{
+  "accuracy": 0.7391981315687037,
+  "balanced_accuracy": 0.7426413774417404,
+  "macro_precision": 0.7559390799732446,
+  "macro_recall_sensitivity": 0.7426413774417404,
+  "macro_f1": 0.7381368939738309,
+  "micro_precision": 0.7391981315687037,
+  "micro_recall": 0.7391981315687037,
+  "micro_f1": 0.7391981315687037,
+  "auc_roc_ovr": 0.9246589402459776,
+  "avg_precision_ovr": 0.8739747751632159,
+  "ece": 0.12227313859122145,
+  "confusion_matrix": [
+    [
+      450,
+      84,
+      391
+    ],
+    [
+      85,
+      484,
+      11
+    ],
+    [
+      99,
+      0,
+      965
+    ]
+  ],
+  "per_class": [
+    {
+      "class_id": 0,
+      "class_name": "Normal",
+      "precision": 0.7097791798107256,
+      "recall_sensitivity": 0.4864864864864865,
+      "f1": 0.5772931366260423,
+      "specificity": 0.8880778588807786,
+      "support": 925
+    },
+    {
+      "class_id": 1,
+      "class_name": "Pneumonia",
+      "precision": 0.852112676056338,
+      "recall_sensitivity": 0.8344827586206897,
+      "f1": 0.8432055749128919,
+      "specificity": 0.9577677224736049,
+      "support": 580
+    },
+    {
+      "class_id": 2,
+      "class_name": "Tuberculosis",
+      "precision": 0.7059253840526701,
+      "recall_sensitivity": 0.9069548872180451,
+      "f1": 0.7939119703825586,
+      "specificity": 0.7328903654485049,
+      "support": 1064
+    }
+  ]
+}

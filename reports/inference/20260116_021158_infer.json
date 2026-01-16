@@ -1,0 +1,13 @@
+{
+  "path": "data/raw/archive/test/tuberculosis/tuberculosis-828.jpg",
+  "pred_id": 0,
+  "pred_name": "Normal",
+  "confidence": 0.501160740852356,
+  "probs": [
+    0.501160740852356,
+    0.0013348676729947329,
+    0.49750441312789917
+  ],
+  "pred_policy_id": 2,
+  "pred_policy_name": "Tuberculosis"
+}

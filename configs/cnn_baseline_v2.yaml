@@ -1,0 +1,70 @@
+# ============================
+# Experiment
+# ============================
+experiment:
+  name: cnn-finetune
+  run_name: cnn-ft50ep-clahe
+
+# Augmentation 
+# ============================
+augmentation:
+  horizontal_flip: False      # avoid L/R inversion in chest X-rays
+  custom_clahe: true        # enhance local contrast
+  rotation_deg: 10
+  shift_limit: 0.05           # conservative spatial transforms
+  scale_limit: 0.10
+  clahe_clip_limit: 1.0
+  clahe_tile_grid: [8, 8]
+  gaussian_blur: false         # must be low-sigma in implementation
+  color_jitter: false         # X-rays are grayscale
+  fill_mode: nearest
+
+# ============================
+# Training
+# ============================
+training:
+  epochs: 50            
+  batch_size: 8
+  lr: 3e-4
+  optimizer: adamw
+  weight_decay: 1e-4
+  seed: 42
+  select_metric: macro_f1
+  early_stopping: false
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.0
+  min_delta: 0.0
+
+
+# ============================
+# Data
+# ============================
+data:
+  img_size: 224
+  in_channels: 1
+  num_workers: 3
+  train_csv: data/train.csv
+  val_csv: data/val.csv
+  test_csv: data/test.csv
+  img_dir: null
+  use_imagenet_norm: false
+  class_names: ["Normal", "Pneumonia", "Tuberculosis"]
+
+# ============================
+# Model
+# ============================
+model:
+  name: cnn_baselinev2
+  num_classes: 3
+  pretrained: false
+  linear_probe: false
+# ============================
+# Logging
+# ============================
+logging:
+  use_mlflow: true
+  use_wandb: true
+  wandb_project: chest-xray
+  mlflow_experiment_name: cnn-ablation-analysis
+  log_dir: logs
+  console_output: true

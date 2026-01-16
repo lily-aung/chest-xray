@@ -8,6 +8,7 @@ BACKBONE_TO_YAML = {
     "densenet121": "densenet121.yaml",
     "efficientnet_b0": "efficientnet_b0.yaml",
     "swin_tiny": "swin_tiny.yaml"}
+    #"cnn-ft50ep-clahe": "cnn_baseline_v2.yaml"}###skip this model
 
 def get_config_for_backbone(backbone: str, config_dir: str = "configs") -> str:
     """ Return YAML config path for backbone or raise if missing"""
