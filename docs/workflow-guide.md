@@ -56,7 +56,7 @@ Preprocessing decisions are driven by systematic EDA conducted in the following 
 - Inspection after Step2 : border removal again check Contrast and exposure 
 - CLAHE evaluation
 - Final preprocessing decisions
-Related Plots can be found here ![EDA_Step1-3](../reports/EDA_Step1-3/) 
+Related Plots can be found here [EDA_Step1-3](../reports/EDA_Step1-3/) 
 
 ## 3. Model Training
 
