@@ -325,5 +325,8 @@ docker run -d --restart unless-stopped \
   chestxray-api:dev
 ```
 
+#### Ready to deploy 
+Download here! [Google Drive Link](https://drive.google.com/file/d/1jLCd9v4YG8DabZeukYGezyroRRxdFtSZ/view?usp=sharing)
+SHA256SUM:258becdab990b7e242ae4c78be2b4c1d8eeca34f68cf8ac4bd1a399025cfcdde
 
 I have tested this file on both macOS and Windows. Windows takes slightly longer, but it works correctly. I do not have a Linux PC, so it has not been tested there.
