@@ -120,7 +120,8 @@ export WANDB_BASE_URL=http://localhost:8080
 
 
 Finally we are ready to move the development stage
+
 ![Figure 3](../reports/figures/setup/3.projectstructure.png)
+Alternatively, clone my repo and ready to build the system.
 
-
-I am running on macOS, so the folder paths and graphics are tailored to a Mac setup.
+I used macOS, therefore the folder paths and graphics are tailored to a Mac setup.
