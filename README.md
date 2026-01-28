@@ -12,7 +12,7 @@ The project is designed to be reproducible, modular, and deployment-ready.
 
 # ⚡ Quick Demo 
 
-URL: http://3.96.47.158
+URL: http://3.96.47.158 <- Temporary disable the link
 ```text 
 username: labviewer
 password: labpassword
@@ -21,6 +21,7 @@ password: labpassword
 
 # 🔬 Project Workflow (High Level)
 
+```text
 Raw Data
   ↓
 EDA & Preprocessing
@@ -36,7 +37,7 @@ Model Bundle Creation
 Docker Inference / API
   ↓
 Web UI + Grad-CAM Visualization
-
+```
 
 ## Repository Structure
 ```text
@@ -136,6 +137,8 @@ Only support for CNN at this stage
 - FastAPI prediction service
 - Self-contained model bundles
 - Web UI (image upload → prediction → Grad-CAM)
+![Inference Workflow](../chest-xray/reports/figures/workflow-guide/InferenceWorkFlow.png)
+
 
 ## Reproducibility
 - YAML-based experiment configs
