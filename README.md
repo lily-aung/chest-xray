@@ -137,8 +137,11 @@ Only support for CNN at this stage
 - FastAPI prediction service
 - Self-contained model bundles
 - Web UI (image upload → prediction → Grad-CAM)
-![Inference Workflow](../chest-xray/reports/figures/workflow-guide/InferenceWorkFlow.png)
 
+<p align="left">
+  <strong>Inference Workflow</strong><br>
+  <img src="reports/figures/workflow-guide/InferenceWorkFlow.png" width="50%"/>
+</p>
 
 ## Reproducibility
 - YAML-based experiment configs
