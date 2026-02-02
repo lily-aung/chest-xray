@@ -15,7 +15,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_
 from pydantic import BaseModel, Field
 
 from src.inference.gradcam_core import build_cam_engine, decode_upload_to_gray, get_module_by_path, overlay_png_bytes, predict_probs
-from src.inference.infer_deployment import build_infer_transform, infer_one, load_model_from_bundle, maybe_apply_custom_clahe, to_model_channels
+from src.inference.infer_deployment import build_infer_transform, infer_one, load_model_from_bundle, apply_custom_clahe, to_model_channels
 
 APP_NAME = "chestxray-infer-api"
 
@@ -395,7 +395,7 @@ def grad_cam(request: Request, file: UploadFile = File(...), _: Any = Depends(re
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
-        img_gray = maybe_apply_custom_clahe(
+        img_gray = apply_custom_clahe(
             img_gray, use_custom_clahe=STATE["use_custom_clahe"],
             clahe_clip_limit=STATE["clahe_clip_limit"],
             clahe_tile_grid=STATE["clahe_tile_grid"])

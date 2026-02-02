@@ -2,11 +2,11 @@
   "path": "data/raw/archive/test/tuberculosis/tuberculosis-4.jpg",
   "pred_id": 2,
   "pred_name": "Tuberculosis",
-  "confidence": 0.7702546715736389,
+  "confidence": 0.848558783531189,
   "probs": [
-    0.20571590960025787,
-    0.02402937412261963,
-    0.7702546715736389
+    0.1513965129852295,
+    4.467387407203205e-05,
+    0.848558783531189
   ],
   "pred_policy_id": 2,
   "pred_policy_name": "Tuberculosis"

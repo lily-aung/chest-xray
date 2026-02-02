@@ -96,9 +96,9 @@ train_hog:
 #################################################################################
 # 2. Evaluation and Inference 
 #################################################################################
-.PHONY: eval-best analyze-best analyze-best-only infer infer-image infer-image-demo
+.PHONY: eval-model eval-best analyze-best analyze-best-only infer infer-image infer-image-demo
 
-OUT_ROOT := reports/best_model_b01
+OUT_ROOT := reports/best_model_b03
 TEST_CSV := data/test.csv
 CLASS_NAMES := Normal,Pneumonia,Tuberculosis
 BORDERLINE_MARGIN := 0.05
@@ -107,6 +107,9 @@ BEST_META := $(OUT_ROOT)/best_model_meta.json
 # 1) Select best model --> evaluate --> save meta
 eval-best:
 	$(PYTHON_INTERPRETER) -m src.eval_best_models --test $(TEST_CSV) --out_root $(OUT_ROOT)
+
+eval-model:
+	$(PYTHON_INTERPRETER) -m src.eval_model --test $(TEST_CSV) --out_root $(OUT_ROOT)
 
 # 2) Error analysis (creates analysis/viz_cases/*.json)
 analyze-best: eval-best
@@ -133,7 +136,7 @@ analyze-best-only:
         gradcam-tb-borderline-fixed gradcam-tb-borderline-topk2 \
         gradcam-correct-normal gradcam-correct-pna gradcam-correct-tb
 		
-CNN_CFG := configs/cnn.yaml
+CNN_CFG := configs/cnn_baseline_v2.yaml #configs/cnn.yaml
 #OUT_ROOT := reports/best_model_eval
 #TEST_CSV := data/test.csv
 #BEST_META := $(OUT_ROOT)/best_model_meta.json
@@ -471,7 +474,6 @@ docker-api-save: docker-build-api
 	$(DOCKER) save "$(DOCKER_API_REF)" | gzip > "$(EXPORT_PATH)"; \
 	ls -lh "$(EXPORT_PATH)"
 
-# Import the image tarball into docker
 # Usage: make docker-api-load EXPORT_PATH=/path/to/chestxray-api_dev.tar.gz
 docker-api-load:
 	@set -e; \

@@ -145,7 +145,7 @@ def build_datasets(cfg):
 
     val_dataset = ChestXrayDataset( csv_file=cfg.data.val_csv,  img_dir=getattr(cfg.data, "img_dir", None),
         transforms=val_transforms(cfg.data.img_size, use_imagenet_norm=use_imagenet_norm, is_rgb=to_rgb),
-        use_custom_clahe=False, to_rgb=to_rgb, strict=True)
+        use_custom_clahe=cfg.augmentation.custom_clahe, to_rgb=to_rgb, strict=True)
 
     return train_dataset, val_dataset
 

@@ -109,7 +109,6 @@ class Trainer:
         macro_f1 = float(f1.mean().item())
         macro_recall = float(recall.mean().item())
         balanced_accuracy = macro_recall
-
         metrics = {
             f"{split}_loss": avg_loss,
             f"{split}_accuracy": accuracy,

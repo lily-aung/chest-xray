@@ -241,3 +241,18 @@ def load_run_model_pytorch(run_id: str):
     model_path = find_mlflow_model_artifact_path(run_id)
     return mlflow.pytorch.load_model(f"runs:/{run_id}/{model_path}")
 
+
+def get_run_by_id(run_id: str, metric: str = "val_macro_f1") -> pd.Series:
+    run = mlflow.get_run(run_id)
+
+    metrics = run.data.metrics
+    tags = run.data.tags
+
+    if metric not in metrics:
+        raise KeyError(f"Metric '{metric}' not found in run {run_id}")
+
+    return pd.Series({
+        "model": tags.get("model", "cnn"),
+        "run_name": tags.get("mlflow.runName"),
+        metric: metrics[metric],
+        "run_id": run_id  })

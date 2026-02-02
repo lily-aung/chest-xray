@@ -106,7 +106,7 @@ def load_grayscale(path: Union[str, Path]) -> np.ndarray:
         raise FileNotFoundError(f"Failed to read image: {path}")
     return img
 
-def maybe_apply_custom_clahe( img_gray: np.ndarray, use_custom_clahe: bool,
+def apply_custom_clahe( img_gray: np.ndarray, use_custom_clahe: bool,
     clahe_clip_limit: float, clahe_tile_grid: Tuple[int, int]) -> np.ndarray:
     if not use_custom_clahe:
         return img_gray
@@ -128,7 +128,7 @@ def infer_one( model: torch.nn.Module, device: torch.device,
     use_custom_clahe: bool, clahe_clip_limit: float,
     clahe_tile_grid: Tuple[int, int], to_rgb: bool) -> Dict:
     img_gray = load_grayscale(image_path)
-    img_gray = maybe_apply_custom_clahe(img_gray, use_custom_clahe, clahe_clip_limit, clahe_tile_grid)
+    img_gray = apply_custom_clahe(img_gray, use_custom_clahe, clahe_clip_limit, clahe_tile_grid)
     img = to_model_channels(img_gray, to_rgb=to_rgb)  # HWC
 
     out = tfm(image=img)

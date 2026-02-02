@@ -35,7 +35,7 @@ def overlay_and_save(img_tensor: torch.Tensor, cam: np.ndarray, out_path: Path, 
 def find_target_layer(model: torch.nn.Module) -> torch.nn.Module:
     """Tailored for CNNBaseline: features[8] is the last conv layer."""
     try:
-        layer = model.features[8]
+        layer = model.features[12]#[8]
     except Exception as e:
         raise ValueError("Expected model.features[8] for CNNBaseline, but could not access it.") from e
     if not isinstance(layer, torch.nn.Conv2d):

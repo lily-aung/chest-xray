@@ -106,7 +106,7 @@ def check_exposure(image, black_thr=0.40, white_thr=0.40, p99_thr=0.50, p01_thr=
 def robust_z(x):
     med = np.median(x)
     mad = np.median(np.abs(x - med)) + 1e-9
-    return 0.6745 * (x - med) / mad
+    return 0.6745 * (x - med) / mad #MAD ≈ 0.6745 × standard deviation
 
 def img_metrics(orig, proc):
     return ( proc.mean(),proc.std(),
