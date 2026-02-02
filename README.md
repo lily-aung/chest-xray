@@ -12,7 +12,7 @@ The project is designed to be reproducible, modular, and deployment-ready.
 
 # ⚡ Quick Demo 
 
-URL: http://3.96.47.158 <- Temporary disable the link
+URL: http://3.99.49.50/
 ```text 
 username: labviewer
 password: labpassword
