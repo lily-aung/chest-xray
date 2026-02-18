@@ -9,14 +9,14 @@ This repository implements an end-to-end medical imaging pipeline for Chest X-ra
 - Lightweight web UI for visualization
 The project is designed to be reproducible, modular, and deployment-ready.
 
+<p align="left">
+  <img src="reports/UI/Objective.png" width="50%"/>
+</p>
 
-# ⚡ Quick Demo 
 
-URL: http://3.99.49.50/
-```text 
-username: labviewer
-password: labpassword
-```
+<p align="left">
+  <img src="reports/UI/SystemOverview.png" width="50%"/>
+</p>
 
 
 # 🔬 Project Workflow (High Level)
