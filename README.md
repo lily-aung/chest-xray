@@ -10,12 +10,12 @@ This repository implements an end-to-end medical imaging pipeline for Chest X-ra
 The project is designed to be reproducible, modular, and deployment-ready.
 
 <p align="left">
-  <img src="reports/UI/Objective.png" width="50%"/>
+  <img src="reports/UI/Objective.png" width="70%"/>
 </p>
 
 
 <p align="left">
-  <img src="reports/UI/SystemOverview.png" width="50%"/>
+  <img src="reports/UI/SystemOverview.png" width="70%"/>
 </p>
 
 
@@ -140,7 +140,7 @@ Only support for CNN at this stage
 
 <p align="left">
   <strong>Inference Workflow</strong><br>
-  <img src="reports/figures/workflow-guide/InferenceWorkFlow.png" width="50%"/>
+  <img src="reports/figures/workflow-guide/InferenceWorkFlow.png" width="70%"/>
 </p>
 
 ## Reproducibility
