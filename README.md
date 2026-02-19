@@ -153,7 +153,7 @@ Only support for CNN at this stage
 
 - [Setup Guide (Training Environment)](docs/setup-guide.md)
 - [Workflow Guide (Training, Evaluation, Makefile)](docs/workflow-guide.md)
-- [Technical Test: Chest X-Ray Classification](docs/TechnicalReport.pdf)
+- [Chest X-Ray Classification Report](docs/TechnicalReport.pdf)
 
 ## License
 See LICENSE for details.
